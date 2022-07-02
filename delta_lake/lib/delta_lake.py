@@ -36,13 +36,25 @@ def get_filepath(bucket,namespace,layer,table):
   
   return _filepath
   
-def read_table(bucket,namespace,layer,table,table_format="delta"):
+def read_table(bucket,namespace,layer,table,options=None,schema=None,table_format="delta"):
   
   # Get filepath
   _filepath = get_filepath(bucket,namespace,layer,table)
   
-  # Read table
-  df = spark.read.format(table_format).load(_filepath)
+  # Create reader
+  reader_df = spark.read.format(table_format)
+  
+  # Set schema if was passed
+  if(schema):
+    reader_df = reader_df.schema(schema)
+    
+  # Set option if was passed
+  if(options):
+    for option in options:
+      reader_df = reader_df.option(option,options[option])
+      
+  # Load
+  df = reader_df.load(_filepath)
   
   return df
 
