@@ -66,13 +66,16 @@ df_prova = (
 
 # COMMAND ----------
 
+# Options to write
+options = {"replaceWhere":"ANO_PROVA == {}".format(year)}
+
 # Save
-(
-  df_prova
-  .write
-  .format("delta")
-  .mode("overwrite")
-  .option("replaceWhere","ANO_PROVA == {}".format(year))
-  .partitionBy("ANO_PROVA")
-  .save("s3://prd-ifood-data-lake-sandbox-generic/generic+microdados_gov/silver/itens-prova")
+write_table(
+  df_prova,
+  bucket_name,
+  "generic+microdados_gov",
+  "silver",
+  "itens-prova",
+  options=options,
+  partitionBy="ANO_PROVA"
 )

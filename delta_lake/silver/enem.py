@@ -197,13 +197,16 @@ df_enem = df_enem.withColumnRenamed("NU_ANO","ANO_PROVA")
 
 # COMMAND ----------
 
+# Options to write
+options = {"replaceWhere":"ANO_PROVA == {}".format(year)}
+
 # Save
-(
-  df_enem
-  .write
-  .format("delta")
-  .mode("overwrite")
-  .option("replaceWhere","ANO_PROVA == {}".format(year))
-  .partitionBy("ANO_PROVA")
-  .save("s3://prd-ifood-data-lake-sandbox-generic/generic+microdados_gov/silver/enem")
+write_table(
+  df_enem,
+  bucket_name,
+  "generic+microdados_gov",
+  "silver",
+  "censo-escolar",
+  options=options,
+  partitionBy="ANO_PROVA"
 )
