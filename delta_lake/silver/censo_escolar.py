@@ -167,13 +167,16 @@ df_censo_escolar = df_censo_escolar.withColumnRenamed("NU_ANO_CENSO","ANO_CENSO"
 
 # COMMAND ----------
 
+# Options to write
+options = {"replaceWhere":"ANO_CENSO == {}".format(year)}
+
 # Save
-(
-  df_censo_escolar
-  .write
-  .format("delta")
-  .mode("overwrite")
-  .option("replaceWhere","ANO_CENSO == {}".format(year))
-  .partitionBy("ANO_CENSO")
-  .save("s3://prd-ifood-data-lake-sandbox-generic/generic+microdados_gov/silver/censo-escolar")
+write_table(
+  df_censo_escolar,
+  bucket_name,
+  "generic+microdados_gov",
+  "silver",
+  "censo-escolar",
+  options=options,
+  partitionBy="ANO_CENSO"
 )
