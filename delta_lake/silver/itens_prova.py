@@ -24,15 +24,21 @@ bucket_name = dbutils.widgets.get("bucket_name")
 
 # Filepath
 filepath_prova = get_filepath(bucket_name,"generic+microdados_gov","bronze","itens-prova")
-filepath_prova = filepath_prova + "/ITENS_PROVA_{}.csv".format(year)
+
+# Get file to process
+files_prova = get_files(".*{}.*".format(year),filepath_prova)
+files_prova = "/".join(files_prova[0].split('/')[-2:])
+print("Processing file: {}".format(files_prova))
 
 # COMMAND ----------
 
 # Schema prova
-schema_prova = StructType([StructField("CO_POSICAO",StringType(),True),StructField("SG_AREA",StringType(),True),StructField("CO_ITEM",StringType(),True),StructField("TX_GABARITO",StringType(),True),StructField("CO_HABILIDADE",StringType(),True),StructField("IN_ITEM_ABAN",StringType(),True),StructField("TX_MOTIVO_ABAN",StringType(),True),StructField("NU_PARAM_A",DoubleType(),True),StructField("NU_PARAM_B",DoubleType(),True),StructField("NU_PARAM_C",DoubleType(),True),StructField("TX_COR",StringType(),True),StructField("CO_PROVA",StringType(),True),StructField("TP_LINGUA",StringType(),True),StructField("IN_ITEM_ADAPTADO",StringType(),True)])
+prova_schema = StructType([StructField("CO_POSICAO",StringType(),True),StructField("SG_AREA",StringType(),True),StructField("CO_ITEM",StringType(),True),StructField("TX_GABARITO",StringType(),True),StructField("CO_HABILIDADE",StringType(),True),StructField("IN_ITEM_ABAN",StringType(),True),StructField("TX_MOTIVO_ABAN",StringType(),True),StructField("NU_PARAM_A",DoubleType(),True),StructField("NU_PARAM_B",DoubleType(),True),StructField("NU_PARAM_C",DoubleType(),True),StructField("TX_COR",StringType(),True),StructField("CO_PROVA",StringType(),True),StructField("TP_LINGUA",StringType(),True),StructField("IN_ITEM_ADAPTADO",StringType(),True)])
 
 # Read files
-df_prova = spark.read.format("csv").option("sep",";").option("encoding","latin1").option("header","True").schema(schema_prova).load(filepath_prova)
+df_prova = (
+  read_table(bucket_name,"generic+microdados_gov","bronze",files_prova,options = {"sep":";","encoding":"latin1","header":"True"},schema=prova_schema,table_format="csv")
+)
 df_prova = df_prova.select("*",f.lit(year).alias("ANO_PROVA"))
 
 # COMMAND ----------

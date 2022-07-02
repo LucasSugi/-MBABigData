@@ -23,13 +23,15 @@ filepath_censo_escolar = get_filepath(bucket_name,"generic+microdados_gov","bron
 
 # Get file to process
 files_censo_escolar = get_files(".*{}.*".format(year),filepath_censo_escolar)
-files_censo_escolar = files_censo_escolar[0]
+files_censo_escolar = "/".join(files_censo_escolar[0].split('/')[-2:])
 print("Processing file: {}".format(files_censo_escolar))
 
 # COMMAND ----------
 
 # Read files
-df_censo_escolar = spark.read.format("csv").option("sep",";").option("encoding","latin1").option("header","True").load(files_censo_escolar)
+df_censo_escolar = (
+  read_table(bucket_name,"generic+microdados_gov","bronze",files_censo_escolar,options = {"sep":";","encoding":"latin1","header":"True"},table_format="csv")
+)
 
 # Repartition
 df_censo_escolar = df_censo_escolar.repartition(sc.defaultParallelism)
