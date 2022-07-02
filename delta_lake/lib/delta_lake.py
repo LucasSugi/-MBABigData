@@ -48,7 +48,7 @@ def read_table(bucket,namespace,layer,table,options=None,schema=None,table_forma
   if(schema):
     reader_df = reader_df.schema(schema)
     
-  # Set option if was passed
+  # Set options if was passed
   if(options):
     for option in options:
       reader_df = reader_df.option(option,options[option])
@@ -57,6 +57,27 @@ def read_table(bucket,namespace,layer,table,options=None,schema=None,table_forma
   df = reader_df.load(_filepath)
   
   return df
+
+def write_table(df,bucket,namespace,layer,table,options=None,partitionBy=None,mode="overwrite",table_format="delta"):
+  
+  # Get filepath
+  _filepath = get_filepath(bucket,namespace,layer,table)
+  
+  # Create writer
+  writer_df  = df.write.format(table_format).mode(mode)
+  
+  # Set option if was passed
+  if(options):
+    for option in options:
+      writer_df = writer_df.option(option,options[option])
+    
+  # Set partition by if was passed
+  if(partitionBy):
+    writer_df = writer_df.partitionBy(partitionBy)
+    
+  # Write
+  print("Writing data on: {}".format(_filepath))
+  writer_df.save(_filepath)
 
 # COMMAND ----------
 
