@@ -10,14 +10,21 @@ from functools import reduce
 
 # COMMAND ----------
 
+# MAGIC %run ../lib/delta_lake
+
+# COMMAND ----------
+
 # Set parameters
 dbutils.widgets.text("year","")
+dbutils.widgets.text("bucket_name","")
 
 # Get parameters
 year = dbutils.widgets.get("year")
+bucket_name = dbutils.widgets.get("bucket_name")
 
 # Filepath
-filepath_prova = ""
+filepath_prova = get_filepath(bucket_name,"generic+microdados_gov","bronze","itens-prova")
+filepath_prova = filepath_prova + "/ITENS_PROVA_{}.csv".format(year)
 
 # COMMAND ----------
 
@@ -61,5 +68,5 @@ df_prova = (
   .mode("overwrite")
   .option("replaceWhere","ANO_PROVA == {}".format(year))
   .partitionBy("ANO_PROVA")
-  .save("")
+  .save("s3://prd-ifood-data-lake-sandbox-generic/generic+microdados_gov/silver/itens-prova")
 )

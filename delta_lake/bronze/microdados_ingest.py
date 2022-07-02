@@ -10,15 +10,17 @@ from os import path
 
 # Set parameters
 dbutils.widgets.text("file","")
+dbutils.widgets.text("bucket_name","")
 
 # Get input parameters
 file = dbutils.widgets.get("file")
+bucket_name = dbutils.widgets.get("bucket_name")
 
 # COMMAND ----------
 
 # Filepaths
-filepath_transient = ""
-filepath_bronze = ""
+filepath_transient = get_filepath(bucket_name,"generic+microdados_gov","transient","")
+filepath_bronze = get_filepath(bucket_name,"generic+microdados_gov","bronze","")
 
 # COMMAND ----------
 

@@ -1,33 +1,32 @@
 # Databricks notebook source
-from pyspark.sql.types import *
+# MAGIC %run ../lib/delta_lake
 
 # COMMAND ----------
 
-def schema2Table(df,table):
-  data = []
-  for s in df.schema:
-    if(s.dataType == StringType()):
-      data.append((table,s.name,"","string"))
+# Set parameters
+dbutils.widgets.text("bucket_name","")
 
-    else:
-      fields = df.schema[s.name].jsonValue()["type"]["fields"]
-      for field in fields:
-        data.append((table,s.name,field["name"],field["type"]))
-
-  return data
+# Get parameters
+bucket_name = dbutils.widgets.get("bucket_name")
 
 # COMMAND ----------
 
-df_itens_prova = spark.read.format("delta").load("")
-df_enem = spark.read.format("delta").load("")
-df_censo_escolar = spark.read.format("delta").load("")
+# Read data
+df_itens_prova = read_table(bucket_name,"generic+microdados_gov","silver","itens-prova")
+df_enem = read_table(bucket_name,"generic+microdados_gov","silver","enem")
+df_censo_escolar = read_table(bucket_name,"generic+microdados_gov","silver","censo-escolar")
 
 # COMMAND ----------
 
-data1 = schema2Table(df_enem,"enem")
-data2 = schema2Table(df_censo_escolar,"censo_escolar")
-data3 = schema2Table(df_itens_prova,"itens_prova")
+# Get schema for each table
+schema_enem = schema2Table(df_enem,"Enem")
+schema_censo_escolar = schema2Table(df_censo_escolar,"Censo Escolar")
+schema_itens_prova = schema2Table(df_itens_prova,"Itens Prova")
 
 # COMMAND ----------
 
-spark.createDataFrame(data1 + data2 + data3,schema=["Tabela","Coluna 1","Coluna 2","Tipo"]).display()
+# Union all schemas
+schema_all = schema_enem.unionByName(schema_censo_escolar).unionByName(schema_itens_prova)
+
+# Show
+schema_all.display()

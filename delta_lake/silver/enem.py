@@ -9,17 +9,17 @@ from pyspark.sql.types import StructField, StructType
 def get_acertos(resposta,gabarito):
 
   if((resposta is not None) & (gabarito is not None)):
-
+    
     # Convert to array
     resposta = list(map(lambda x: x,resposta))
     gabarito = list(map(lambda x: x,gabarito))
-
+    
     nota = 0
     for r,g in zip(resposta,gabarito):
       if(r == g):
         nota = nota + 1
     return nota
-
+    
   return None
 
 # COMMAND ----------
@@ -30,12 +30,14 @@ def get_acertos(resposta,gabarito):
 
 # Set parameters
 dbutils.widgets.text("year","")
+dbutils.widgets.text("bucket_name","")
 
 # Get parameters
 year = dbutils.widgets.get("year")
+bucket_name = dbutils.widgets.get("bucket_name")
 
 # Filepath
-filepath_enem = ""
+filepath_enem = get_filepath(bucket_name,"generic+microdados_gov","bronze","enem")
 
 # Get file to process
 files_enem = get_files(".*{}.*".format(year),filepath_enem)
@@ -201,5 +203,5 @@ df_enem = df_enem.withColumnRenamed("NU_ANO","ANO_PROVA")
   .mode("overwrite")
   .option("replaceWhere","ANO_PROVA == {}".format(year))
   .partitionBy("ANO_PROVA")
-  .save("")
+  .save("s3://prd-ifood-data-lake-sandbox-generic/generic+microdados_gov/silver/enem")
 )
