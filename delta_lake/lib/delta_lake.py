@@ -216,3 +216,24 @@ def schema2Table(df,table_name):
   df = df.select(["Tabela","Coluna 1","Coluna 2","Tipo"])
         
   return df
+
+# COMMAND ----------
+
+def set_id(df,id_columns,seed,alias="ID"):
+
+  # Cast to string
+  select_id_columns = [f.col(column).cast("string") for column in id_columns]
+  
+  # Set seed
+  select_id_columns = select_id_columns + [f.lit(seed)]
+  
+  # Fill nulls
+  select_id_columns = f.concat(*[f.when(column.isNull(),"").otherwise(column) for column in select_id_columns])
+  
+  # Select hash
+  select_hash = f.sha2(select_id_columns,256).alias(alias)
+
+  # Apply hash
+  df = df.select(select_hash,"*")
+  
+  return df
