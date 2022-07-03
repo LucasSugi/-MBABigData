@@ -185,7 +185,7 @@ struct_dict = {
     , "NOTA_PROVA": ["NU_NOTA_CN","NU_NOTA_CH","NU_NOTA_LC","NU_NOTA_MT"]
     , "ACERTOS": ["ACERTOS_CN","ACERTOS_CH","ACERTOS_LC","ACERTOS_MT"]
     , "REDACAO": ["TP_STATUS_REDACAO","NU_NOTA_COMP1","NU_NOTA_COMP2","NU_NOTA_COMP3","NU_NOTA_COMP4","NU_NOTA_COMP5","NU_NOTA_REDACAO"]
-    , "QUESTIONARO_SOCIO_ECONOMICO": ["Q001","Q002","Q003","Q004","Q005","Q006","Q007","Q008","Q009","Q010","Q011","Q012","Q013","Q014","Q015","Q016","Q017","Q018","Q019","Q020","Q021","Q022","Q023","Q024","Q025","Q026","Q027"]
+    , "QUESTIONARIO_SOCIO_ECONOMICO": ["Q001","Q002","Q003","Q004","Q005","Q006","Q007","Q008","Q009","Q010","Q011","Q012","Q013","Q014","Q015","Q016","Q017","Q018","Q019","Q020","Q021","Q022","Q023","Q024","Q025","Q026","Q027"]
 }
 select_struct = [f.struct(*struct_dict[k]).alias(k) for k in struct_dict]
 
@@ -198,7 +198,7 @@ df_enem = df_enem.withColumnRenamed("NU_ANO","ANO_PROVA")
 # COMMAND ----------
 
 # Options to write
-options = {"replaceWhere":"ANO_PROVA == {}".format(year)}
+options = {"replaceWhere":"ANO_CENSO == {}".format(year)}
 
 # Save
 write_table(
@@ -206,7 +206,7 @@ write_table(
   bucket_name,
   "generic+microdados_gov",
   "silver",
-  "censo-escolar",
+  "enem",
   options=options,
   partitionBy="ANO_PROVA"
 )
