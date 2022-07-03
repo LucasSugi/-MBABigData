@@ -18,6 +18,9 @@ from numpy import identity
 import pyspark.sql.functions as f
 from pyspark.sql.types import *
 
+# Unicodedata
+from unicodedata import normalize as unicodedata_normalize, combining as unicodedata_combining
+
 # COMMAND ----------
 
 def aws_mount(bucket_name,mount_name):
@@ -198,9 +201,11 @@ def schema2Table(df,table_name):
     if(s.dataType == StringType()):
       data.append((s.name,"","string"))
     elif(s.dataType == IntegerType()):
-      data.append((table,s.name,"","int"))
+      data.append((s.name,"","integer"))
     elif(s.dataType == DoubleType()):
-      data.append((table,s.name,"","double"))
+      data.append((s.name,"","double"))
+    elif(s.dataType == LongType()):
+      data.append((s.name,"","long"))
     else:
       fields = df.schema[s.name].jsonValue()["type"]["fields"]
       for field in fields:
@@ -237,3 +242,10 @@ def set_id(df,id_columns,seed,alias="ID"):
   df = df.select(select_hash,"*")
   
   return df
+
+# COMMAND ----------
+
+@udf(returnType=StringType())
+def normalize(input_str):
+    nfkd_form = unicodedata_normalize('NFKD', input_str)
+    return u"".join([c for c in nfkd_form if not unicodedata_combining(c)])
