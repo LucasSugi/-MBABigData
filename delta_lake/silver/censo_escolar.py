@@ -38,6 +38,22 @@ df_censo_escolar = df_censo_escolar.repartition(sc.defaultParallelism)
 
 # COMMAND ----------
 
+df_censo_escolar.display()
+
+# COMMAND ----------
+
+# Apply string normalization
+normalize_columns = ["NO_UF","NO_MUNICIPIO","NO_MESORREGIAO","NO_MICRORREGIAO","NO_ENTIDADE","DS_ENDERECO","DS_COMPLEMENTO","NO_BAIRRO"]
+select_normalize_columns = [f.upper(normalize(column)).alias(column) for column in normalize_columns]
+
+# Get other columns
+select_other_columns = [column for column in df_censo_escolar.columns if column not in normalize_columns]
+
+# Apply select
+df_censo_escolar = df_censo_escolar.select(*select_other_columns,*normalize_columns)
+
+# COMMAND ----------
+
 # Change Data Types
 select_datatypes = []
 for column in df_censo_escolar.columns:
