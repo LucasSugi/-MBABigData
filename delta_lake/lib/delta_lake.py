@@ -9,7 +9,7 @@ from zipfile import ZipFile
 from os import path
 
 # Regex
-from re import search
+from re import search, sub
 
 # Numpy
 from numpy import identity
@@ -84,16 +84,17 @@ def write_table(df,bucket,namespace,layer,table,options=None,partitionBy=None,mo
 
 # COMMAND ----------
 
-def download_to_transient(url,filepath):
+def download_to_transient(url,filepath,verify=True):
   """Download files from an url and save in a filepath
 
   Args:
       url (str): url to download data
       filepath (str): filepath to save data
+      verify (Bool): Default to True. Verify or not the host do download
   """
   
   # Get url in stream mode
-  with get(url,stream=True) as response:
+  with get(url,stream=True,verify=verify) as response:
     
     # Save in chunks
     with open(filepath,"wb") as download_file:
@@ -131,6 +132,53 @@ def unzip_from_transient_to_bronze(filepath_zip,filepath_dst,extension_to_extrac
         elif(zip_info.filename.lower().endswith(extension_to_extract)):
           print("Extracting file {} to {}".format(zip_info.filename,filepath_dst))
           zip_file.extract(zip_info, filepath_dst)
+          
+def move_file(src,dst):
+  """Move file between two buckets with prefix
+
+  Args:
+      src (str): source bucket
+      dst (str): dst bucket
+  """
+  
+  # Guarantee destination have the correct pattern
+  dst = sub(" ","_",sub("\s+"," ",dst)).lower()
+  
+  # Print
+  print("Moving file from {} to {}".format(src,dst))
+  
+  dbutils.fs.mv(src,dst)
+  
+def get_size_from_filepath(filepath,size_type="b"):
+  """Get the size from all files in a filepath
+
+  Args:
+      filepath (str): source bucket
+      size_type (str): Type of conversion to apply (b is bytes, kb is killobytes, mb is megabytes and gb is gigabytes)
+  """
+  
+  from numpy import sum as np_sum
+  
+  # Get sizes
+  sizes = [file.size for file in dbutils.fs.ls(filepath)]
+  
+  # Sum all
+  size_all = np_sum(sizes)
+  
+  # Check if need conversion
+  if(size_type == "b"):
+    pass
+  elif(size_type == "kb"):
+    size_all = size_all / (1024)
+  elif(size_type == "mb"):
+    size_all = size_all / (1024**2)
+  elif(size_type == "gb"):
+    size_all = size_all / (1024**3)
+  else:
+    raise ValueError("size_type '{}' its invalid. Only allowed values are:  'b', 'kb', 'mb' and 'gb'".format(size_type))
+  
+  # Sum
+  return size_all
 
 # COMMAND ----------
 
