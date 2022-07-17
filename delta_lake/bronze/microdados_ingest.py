@@ -31,14 +31,14 @@ files_to_move = get_files(file,filepath_transient)
 
 # Move each file to bronze
 for file in files_to_move:
-  if("ENEM" in file):
+  if("enem" in file.lower()):
     folder = "enem"
-  elif("ITENS" in file):
+  elif("itens" in file.lower()):
     folder = "itens-prova"
-  elif("ed_basica" in file):
+  elif("ed_basica" in file.lower()):
     folder = "censo-escolar"
   else:
     raise Exception("file '{}' its invalid. We dont recognize the correct folder to store".format(file))
-    
-  print("Moving file from {} to {}".format(file,folder))
-  dbutils.fs.mv(file,path.join(filepath_bronze,folder))
+  
+  # Move
+  move_file(file,path.join(filepath_bronze,folder))

@@ -33,9 +33,9 @@ filepath_extract = path.join(filepath_transient,filepath.format(year))
 
 # COMMAND ----------
 
-# Enem
+# Dowload
 print("Extracting data from {} to {}".format(url_full,filepath_extract))
-download_to_transient(url_full,filepath_extract)
+download_to_transient(url_full,filepath_extract,False)
 
 # COMMAND ----------
 
