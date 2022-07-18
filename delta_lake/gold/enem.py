@@ -55,7 +55,7 @@ df_enem_base = set_id(df_enem_base,["QUESTIONARIO_SOCIO_ECONOMICO"],seed_id,"ID_
 # COMMAND ----------
 
 # Split into fact and dimension tables
-df_enem_fact = df_enem_base.select("ID_CIDADE_ANO","ID_PARTICIPANTE","ID_QUESTIONARIO_SOCIO_ECONOMICO","NOTA_PROVA.*","ACERTOS.*","NU_NOTA_REDACAO")
+df_enem_fact = df_enem_base.select("ID_CIDADE_ANO","ID_PARTICIPANTE","ID_QUESTIONARIO_SOCIO_ECONOMICO","ANO_PROVA","NOTA_PROVA.*","ACERTOS.*","NU_NOTA_REDACAO")
 df_enem_dimension_participante = df_enem_base.select("ID_PARTICIPANTE","PARTICIPANTE.*").distinct()
 df_enem_dimension_questionario = df_enem_base.select("ID_QUESTIONARIO_SOCIO_ECONOMICO","QUESTIONARIO_SOCIO_ECONOMICO.*").distinct()
 
