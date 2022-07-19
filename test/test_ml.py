@@ -79,3 +79,6 @@ for i in range(5):
 
   # Training
   train_rf(df_enem)
+
+  # Clear cache
+  spark.catalog.clearCache()

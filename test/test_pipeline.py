@@ -36,7 +36,5 @@ for i in range(5):
 
   print(f"Took: {elapsed} min")
 
-# COMMAND ----------
-
-# 15.0 min
-# 19.23
+  # Clear cache
+  spark.catalog.clearCache()
