@@ -294,6 +294,10 @@ def set_id(df,id_columns,seed,alias="ID"):
 # COMMAND ----------
 
 @udf(returnType=StringType())
-def normalize(input_str):
-    nfkd_form = unicodedata_normalize('NFKD', input_str)
-    return u"".join([c for c in nfkd_form if not unicodedata_combining(c)])
+def normalize_str(input_str):
+    
+    if(isinstance(input_str,str)):  
+      nfkd_form = unicodedata_normalize('NFKD', input_str)
+      return u"".join([c for c in nfkd_form if not unicodedata_combining(c)])
+    else:
+      return None
