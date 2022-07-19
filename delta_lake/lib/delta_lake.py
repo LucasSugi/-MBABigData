@@ -180,6 +180,18 @@ def get_size_from_filepath(filepath,size_type="b"):
   # Sum
   return size_all
 
+def get_size_from_delta(delta_filepath):
+  """Get the size from delta table
+
+  Args:
+      delta_filepath (str): Filepath of delta table
+  """
+  
+  # Get size
+  size = spark.sql("describe detail delta.`{}`".format(delta_filepath)).select("sizeInBytes").collect()[0][0]
+  
+  return size
+
 # COMMAND ----------
 
 def get_files(file_regex,filepath):
