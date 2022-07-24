@@ -1,6 +1,6 @@
 # MBABigData
 
-This repository contains all the code used in the conclusion work of the MBA IA Big Data course held at the University of São Paulo at the Institute of Mathematics and Computing Sciences.
+This repository contains all the code used in the conclusion work of the MBA IA Big Data course (2022) held at the University of São Paulo at the Institute of Mathematics and Computing Sciences.
 
 # Objective
 
@@ -16,4 +16,4 @@ Code was developed on Databricks because of it we have some commands that will p
 
 # Enviroment
 
-Code was developed on Databricks (10.4 LTS (includes Apache Spark 3.2.1, Scala 2.12) and AWS
+Code was developed on Databricks 10.4 LTS (includes Apache Spark 3.2.1, Scala 2.12) and AWS
