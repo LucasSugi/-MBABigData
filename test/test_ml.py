@@ -7,8 +7,14 @@ from pyspark.ml.feature import VectorAssembler
 from pyspark.ml.tuning import ParamGridBuilder
 from pyspark.ml.tuning import CrossValidator
 
+# Pyspark
+from pyspark.storagelevel import StorageLevel
+
 # Time
 from time import time
+
+# Functools
+from functools import reduce
 
 # COMMAND ----------
 
@@ -25,10 +31,10 @@ bucket_name = dbutils.widgets.get("bucket_name")
 # COMMAND ----------
 
 def train_rf(data):
-  
+
   # Start time
   start = time()
-  
+
   # Create assembles
   assembler = VectorAssembler(inputCols=data.columns[:-1], outputCol="features")
   output = assembler.transform(data)
@@ -55,7 +61,7 @@ def train_rf(data):
 
   # Prediciton
   predictions = cvModel.transform(data)
-  
+
   # End time
   end = time()
 
@@ -63,6 +69,23 @@ def train_rf(data):
   elapsed = round((end-start) / 60,1)
 
   print(f"Took: {elapsed} min")
+
+def increaset_df(df,n):
+
+  # Get old partitions
+  old_partitions = df.rdd.getNumPartitions()
+
+  # Increase dataset
+  if(n == 1):
+    df_test = df
+  else:
+    df_test = reduce(lambda x,y: x.union(y),[df for i in range(n)])
+
+  # Persist on DISK because union will generate a lot of tasks
+  df_test = df_test.coalesce(old_partitions * n).persist(StorageLevel.DISK_ONLY)
+  df_test.count()
+
+  return df_test
 
 # COMMAND ----------
 
@@ -75,10 +98,24 @@ df_enem = df_enem.toDF(*[column.lower() for column in df_enem.columns]).fillna(0
 
 # COMMAND ----------
 
-for i in range(5):
+# N
+n_scalability = 10
+n_sample = 5
 
-  # Training
-  train_rf(df_enem)
+# To test scalability
+for i in range(n_scalability):
 
-  # Clear cache
-  spark.catalog.clearCache()
+  if(i >= 1):
+
+    print("Qtd datasets: {}".format(i+1))
+
+    for j in range(n_sample):
+
+      # Increase dataset
+      df_test = increaset_df(df_enem,i+1)
+
+      # Training
+      train_rf(df_test)
+
+    # Clear all cache
+    spark.catalog.clearCache()
