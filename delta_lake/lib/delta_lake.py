@@ -218,6 +218,13 @@ def build_case_when(dict_case_when,column,operator,alias):
   
   return select_case_when
 
+def rename_columns(df,columns_dict):
+  
+  # Rename columns
+  for column in columns_dict:
+    df = df.withColumnRenamed(column,columns_dict[column])
+  return df
+
 # COMMAND ----------
 
 def one_hot_encoding(df,column_name):
